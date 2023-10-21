@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family:monospace;
 }
 
 .mainspace {
@@ -12,8 +13,153 @@
     background-color: black;
 }
 
+.logo {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    transition: opacity 0.3s ease-out;
+}
+
+/* SIDEMENU */
+
+.menu {
+    height: 100%;
+    min-width: 300px;
+    background: black;
+    color: white;
+    font-size: 1.5em;
+    overflow-y: scroll;
+}
+
+.menu::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+.list-item {
+    display: flex;
+    align-items: center;
+    padding: 1em;
+    cursor: pointer;
+    white-space: nowrap;
+    height: 80px;
+}
+
+.list-item:hover {
+    background-color: #202123;
+}
+
+.video-selected {
+    background-color: grey;
+}
+
+.mkv-subs {
+    display: none;
+    position: fixed;
+    left: 390px;
+    height: 60px;
+    width: 60px;
+    background: white;
+    border-radius: 100%;
+    border: 8px solid #DC1A28;
+    opacity: 0;
+    z-index: 1;
+    transition: all 0.3s;
+    animation: desplazamiento 0.6s ease-out forwards;
+}
+
+.mkv-subs img {
+    max-width: 75%;
+    max-height: 75%;
+}
+
+.selected {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+}
+
+.mkv-subs.selected:hover {
+    scale: 1.1;
+}
+
+/* VIDEO */
+
 video {
-    width: 100%; 
+    width: 80%; 
     height: 100%;
     object-fit: cover; 
 }
+
+/* MODAL */
+
+.modal, .loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; 
+    display: none; 
+}
+
+.modal-content {
+    display: flex;
+    background-color: #fff;
+    padding: 20px;
+    border: 8px solid #DC1A28;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.modal-content .error-sign {
+    height: 128px;
+    margin-bottom: 20px;
+}
+
+.modal-content .modal-title {
+    margin-bottom: 20px;
+}
+
+/* LOADER */
+
+.loader img {
+    animation: loaderAnimation 2s infinite ease-in-out;
+}
+
+/* KEYFRAMES */
+
+@keyframes desplazamiento {
+    0% {
+        opacity: 0;
+        transform: translateX(0);
+    }
+    80% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(-74px);
+    }
+}
+
+@keyframes loaderAnimation {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.5);
+      opacity: 0.3;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }

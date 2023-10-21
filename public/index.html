@@ -9,7 +9,26 @@
 </head>
 <body>
     <div class="mainspace">
-        <video id="video" src="assets/DC-Movie 23.mp4" controls></video>
+        <div class="menu">
+    
+        </div>
+        <video class="video" src="assets/video/JJK_S02_10.mkv" controls>
+            <track label="Inglés" kind="subtitles" srclang="en" src="assets/subtitles/subs.vtt" default type="text/vtt">
+        </video>
+        <img src="./assets/img/casaflix.png" class="logo" alt="">
     </div>
+    <div class="modal">
+        <div class="modal-content">
+            <img class="error-sign" src="./assets/img/cross.png" alt="">
+            <h1 class="modal-title">Se ha liao parda, ¿sabes?</h1>
+            <h2  class="modal-message">test subtitle</p>
+        </div>
+    </div>
+    <div class="loader">
+        <img src="./assets/img/casaflix.png" alt="">
+    </div>
+    <script type="module" src="utils.js"></script>
+    <script type="module" src="api.js"></script>
+    <script type="module" src="casaflix.js"></script>
 </body>
 </html>
