@@ -1,4 +1,4 @@
-import { showLoader, closeLoader, showModal } from "./utils.js"
+import { showLoader, closeLoader, showModal , hideLogo, showLogo} from "./utils.js"
 import { API_ERROR } from "./api-error.js"
 
 export const getFiles = async () => {
@@ -18,17 +18,21 @@ export const getFiles = async () => {
 
 export const getSubs = async (mkv) => {
     try {
+        hideLogo()
         showLoader()
         const response = await fetch(`http://192.168.1.38:3000/subs?mkv=${mkv}`)
         const data = await response.json()
         closeLoader()
+        showLogo()
 
         if(!response.ok) {
-            throw new Error(data.message)
+            throw new Error()
         }
         
         return data
     } catch (error) {
-        showModal(error.message)
+        closeLoader()
+        showModal(API_ERROR.serverError)
+        showLogo()
     }
 }

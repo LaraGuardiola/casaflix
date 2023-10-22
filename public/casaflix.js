@@ -1,8 +1,7 @@
-import { closeModal, modal } from './utils.js';
+import { closeModal, modal, logo, hideSubsSelected, showSubsSelected} from './utils.js';
 import { getFiles, getSubs } from './api.js'
 const menu = document.querySelector(".menu")
 const video = document.querySelector(".video")
-const logo = document.querySelector(".logo")
 
 const appendListItem= (div, file) => {
     let p = document.createElement("p")
@@ -35,9 +34,7 @@ const createMkvSubs = (menu, div) => {
     mkvSubs.appendChild(subsImg)
 
     mkvSubs.onclick = async () => {
-        let mkv = div.firstChild.innerText
-        await getSubs(mkv)
-        
+        await setVideoSubs(div)
     }
 }
 
@@ -69,8 +66,21 @@ const addVideoEvent = (div) => {
     }
 }
 
-const setVideo = (file) => {
+const setVideoSubs = async (div) => {
+    let mkv = div.firstChild.innerText
+    const { tracks, indexes } = await getSubs(mkv)
+    console.log(tracks, indexes)
+    if(tracks.length > 0) {
+        tracks.forEach((track, index) => {
+            const trackElement = document.createElement("track")
+            trackElement.label = track
+            trackElement.kind = "subtitles"
+            trackElement.type = "text/vtt"
+            trackElement.src = `./assets/subtitles/${mkv.replace(".mkv", "")}_${indexes[index].at(-1)}_${track}.vtt`
 
+            video.appendChild(trackElement)
+        })
+    }
 }
 
 const init = async() => {
@@ -79,6 +89,12 @@ const init = async() => {
 
 init()
 
-video.addEventListener("play", () => logo.style.opacity = 0)
-video.addEventListener("pause", () => logo.style.opacity = 1)
+video.addEventListener("play", () => {
+    logo.style.opacity = 0
+    hideSubsSelected()
+})
+video.addEventListener("pause", () => {
+    logo.style.opacity = 1
+    showSubsSelected()
+})
 modal.addEventListener("click", closeModal)

@@ -14,33 +14,38 @@ app.use(morgan('dev'))
 
 app.get('/files', (req, res) => {
     fs.readdir(videoRoute, (err, files) => {
-        console.log(files)
         res.json(files)
     })
 })
 
 app.get('/subs', async (req, res) => {
     const { mkv } = req.query
-    const tracks = await extractSubtitles(mkv)
+    try {
+        const tracks = await extractSubtitles(mkv)
+        const tracksVtt = []
 
-    fs.readdir(subtitlesRoute, (err, subs) => {
-        subs = subs.filter(sub => sub.includes(".srt"))
-        subs.forEach(async sub => {
+        const subs = await fs.promises.readdir(subtitlesRoute)
+        const filteredSubs = subs.filter(sub => sub.includes(mkv.replace(".mkv", "")) && sub.endsWith(".srt"))
+
+        await Promise.all(filteredSubs.map(async sub => {
             try {
-                await convertirSRTaVTT(`${subtitlesRoute}${sub}`, `${subtitlesRoute}${sub.replace(".srt", ".vtt")}`)
+                const conversion = await convertirSRTaVTT(`${subtitlesRoute}${sub}`, `${subtitlesRoute}${sub.replace(".srt", ".vtt")}`)
+                tracksVtt.push(conversion)
             } catch (error) {
                 console.error(error)
             }
-        })
-    })
+        }))
 
-    if(tracks === API_ERROR.fileNotFound) return res.status(404).json({ message: API_ERROR.fileNotFound })
-    if(tracks === API_ERROR.infoExtractionError) return res.status(500).json({ message: API_ERROR.infoExtractionError })
-    if(tracks === API_ERROR.noSubsAvailableError) return res.status(404).json({ message: API_ERROR.noSubsAvailableError })
-    if(tracks === API_ERROR.subsExtractionError) return res.status(500).json({ message: API_ERROR.subsExtractionError })
-    if(tracks === API_ERROR.cliError) return res.status(500).json({ message: API_ERROR.cliError })
-    if(tracks.length > 0) return res.status(200).json({ message: "all good fella" })
-    
+        if(tracks === API_ERROR.fileNotFound) return res.status(404).json({ message: API_ERROR.fileNotFound })
+        if(tracks === API_ERROR.infoExtractionError) return res.status(500).json({ message: API_ERROR.infoExtractionError })
+        if(tracks === API_ERROR.noSubsAvailableError) return res.status(404).json({ message: API_ERROR.noSubsAvailableError })
+        if(tracks === API_ERROR.subsExtractionError) return res.status(500).json({ message: API_ERROR.subsExtractionError })
+        if(tracks === API_ERROR.cliError) return res.status(500).json({ message: API_ERROR.cliError })
+        if(tracks.length > 0) return res.status(200).json({ message: "all good fella", tracks: tracksVtt, indexes: tracks })
+
+    } catch (error) {
+        return res.status(500).json({ message: API_ERROR.serverError })
+    }
 })
 
 app.listen(3000, () => console.log('listening on port 3000'))
