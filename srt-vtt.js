@@ -50,5 +50,3 @@ export function findLanguage(languageLine) {
     }
   }
 }
-
-  // convertirSRTaVTT('.\\public\\assets\\subtitulos_2.srt','.\\public\\assets\\subtitulos_2.vtt')

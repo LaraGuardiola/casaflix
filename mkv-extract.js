@@ -63,6 +63,4 @@ export async function extractSubtitles(archivoMKV) {
 }
 
 
-// extractSubtitles(archivoMKV, salidaSubs)
-
 

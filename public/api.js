@@ -1,5 +1,4 @@
 import { showLoader, closeLoader, showModal , hideLogo, showLogo} from "./utils.js"
-import { API_ERROR } from "./api-error.js"
 
 export const getFiles = async () => {
     try {
@@ -7,12 +6,13 @@ export const getFiles = async () => {
         const files = await response.json()
 
         if(!response.ok) {
-            throw new Error()
+            throw new Error(data.message)
         }
 
         return files
     } catch (error) {
-        showModal(API_ERROR.filesNotFound)
+        showModal(error.message)
+        return error
     }
 }
 
@@ -26,13 +26,14 @@ export const getSubs = async (mkv) => {
         showLogo()
 
         if(!response.ok) {
-            throw new Error()
+            throw new Error(data.message)
         }
         
         return data
     } catch (error) {
         closeLoader()
-        showModal(API_ERROR.serverError)
+        showModal(error.message)
         showLogo()
+        return error
     }
 }

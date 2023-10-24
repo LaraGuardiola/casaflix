@@ -38,7 +38,7 @@ app.get('/subs', async (req, res) => {
 
         if(tracks === API_ERROR.fileNotFound) return res.status(404).json({ message: API_ERROR.fileNotFound })
         if(tracks === API_ERROR.infoExtractionError) return res.status(500).json({ message: API_ERROR.infoExtractionError })
-        if(tracks === API_ERROR.noSubsAvailableError) return res.status(404).json({ message: API_ERROR.noSubsAvailableError })
+        if(tracks === API_ERROR.noSubsAvailableError) return res.status(400).json({ message: API_ERROR.noSubsAvailableError, tracks: [], indexes: []})
         if(tracks === API_ERROR.subsExtractionError) return res.status(500).json({ message: API_ERROR.subsExtractionError })
         if(tracks === API_ERROR.cliError) return res.status(500).json({ message: API_ERROR.cliError })
         if(tracks.length > 0) return res.status(200).json({ message: "all good fella", tracks: tracksVtt, indexes: tracks })

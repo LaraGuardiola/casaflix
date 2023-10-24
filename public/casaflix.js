@@ -1,7 +1,9 @@
-import { closeModal, modal, logo, hideSubsSelected, showSubsSelected} from './utils.js';
+import { closeModal, modal, logo, srcLangs, showModal } from './utils.js'
 import { getFiles, getSubs } from './api.js'
+import { API_ERROR } from './api-error.js'
 const menu = document.querySelector(".menu")
 const video = document.querySelector(".video")
+const subs = document.querySelector(".mkv-subs")
 
 const appendListItem= (div, file) => {
     let p = document.createElement("p")
@@ -15,71 +17,72 @@ const createSidemenu = (files) => {
             const div = document.createElement("div")
             div.className = "list-item"
             appendListItem(div, file)
+            menu.addEventListener("scroll", () => {
+                setStickyItemEvent(div)
+            })
             addVideoEvent(div)
             menu.appendChild(div)
-            createMkvSubs(menu, div)
         })
     } catch (error) {
         console.error(error)
     }
 }
 
-const createMkvSubs = (menu, div) => {
-    const mkvSubs = document.createElement("div")
-    mkvSubs.className = "mkv-subs"
-    menu.appendChild(mkvSubs)
-
-    const subsImg = document.createElement("img")
-    subsImg.src = "./assets/img/sub.png"
-    mkvSubs.appendChild(subsImg)
-
-    mkvSubs.onclick = async () => {
-        await setVideoSubs(div)
-    }
-}
-
 const addVideoEvent = (div) => {
-    let originalTop = 0
-
     div.onclick = () => {
         let videos = document.querySelectorAll('.list-item')
         let file = div.firstChild.innerText
-        let indexOf = Array.from(div.parentNode.children).indexOf(div)
-        let mkvSubs = div.parentNode.children[indexOf + 1]
 
+        //clean up classes and tracks
         videos.forEach(video => video.classList.remove("video-selected"))
-        Array.from(div.parentNode.children).forEach(mkvSubs => mkvSubs.classList.remove("selected"))
 
-        div.classList.add("video-selected")
-        mkvSubs.classList.add("selected")
-        
-        // Se asegura que el elemento se quede pegado a su correspondiente video
-        if (originalTop === 0) {
-            originalTop = mkvSubs.offsetTop;
+        if(video.children.length > 0) {
+            Array.from(video.children).forEach(track => video.removeChild(track))
         }
 
-        mkvSubs.style.transform = "translateX(-80px)"
-        mkvSubs.style.top = `${originalTop - 70}px`
-
+        div.classList.add("video-selected")
         video.setAttribute("src", `assets/video/${file}`)
-        
     }
+}
+
+const getSubtitles = async () => {
+    const item = document.querySelector(".list-item.video-selected")
+
+    if(!item || video.children.length > 0) {
+        return showModal(API_ERROR.noFileSelectedError)
+    }
+
+    return await setVideoSubs(item)
 }
 
 const setVideoSubs = async (div) => {
     let mkv = div.firstChild.innerText
     const { tracks, indexes } = await getSubs(mkv)
-    console.log(tracks, indexes)
-    if(tracks.length > 0) {
+    if(tracks && indexes && tracks.length > 0) {
         tracks.forEach((track, index) => {
             const trackElement = document.createElement("track")
             trackElement.label = track
             trackElement.kind = "subtitles"
             trackElement.type = "text/vtt"
+            trackElement.srclang = srcLangs[track]
             trackElement.src = `./assets/subtitles/${mkv.replace(".mkv", "")}_${indexes[index].at(-1)}_${track}.vtt`
 
             video.appendChild(trackElement)
         })
+    }
+}
+
+const setStickyItemEvent = (div) => {
+    let stickyItem = null
+    if(document.querySelector(".list-item.video-selected")) {
+        const rect = div.getBoundingClientRect()
+        if (rect.top >= 0 && rect.bottom <= menu.clientHeight && !stickyItem) {
+            stickyItem = div
+        }
+        
+        if (stickyItem) {
+            stickyItem.classList.add('sticky')
+        }
     }
 }
 
@@ -91,10 +94,11 @@ init()
 
 video.addEventListener("play", () => {
     logo.style.opacity = 0
-    hideSubsSelected()
+    subs.style.animation = "desplazamientoDer 0.6s ease-out forwards"
 })
 video.addEventListener("pause", () => {
     logo.style.opacity = 1
-    showSubsSelected()
+    subs.style.animation = "desplazamientoIzq 0.6s ease-out forwards"
 })
+subs.addEventListener("click", getSubtitles)
 modal.addEventListener("click", closeModal)

@@ -5,5 +5,6 @@ export const API_ERROR = {
     subsExtractionError: 'Error al tratar de extraer los subtítulos.',
     cliError: 'Error al ejecutar comandos de extracción.',
     noSubsAvailableError: 'No hay subtitulos disponibles.',
-    serverError: 'Revisa el código amigo.'
+    serverError: 'Revisa el código amigo.',
+    noFileSelectedError: 'No has seleccionado video.'
 }
